@@ -9,6 +9,10 @@ export class PostGresRepository implements IScraperRepository {
   async saveMedia(
     mediaData: { url: string; type: string; sourceUrl: string }[],
   ): Promise<Media[]> {
+    if (!this.mediaModel.sequelize) {
+      throw new Error('Sequelize instance is not available');
+    }
+
     const transaction = await this.mediaModel.sequelize.transaction();
     try {
       const media = await this.mediaModel.bulkCreate(mediaData, {

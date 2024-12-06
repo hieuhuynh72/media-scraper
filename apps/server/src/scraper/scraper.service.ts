@@ -14,6 +14,16 @@ export class ScraperService {
     private readonly scraperRepository: IScraperRepository,
   ) {}
 
+  // Method to get media from the repository
+  async getPaginatedMedia(
+    type?: string,
+    search?: string,
+    page = 1,
+    limit = 10,
+  ) {
+    return this.scraperRepository.getPaginatedMedia(type, search, page, limit);
+  }
+
   /**
    * Scrapes media from an array of URLs.
    * @param dto - DTO containing the array of URLs.

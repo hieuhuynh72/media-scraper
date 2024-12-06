@@ -1,0 +1,71 @@
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Filter Section */
+.filter-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.select,
+.input {
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.input {
+    width: 250px;
+}
+
+/* Media Grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.grid-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    text-align: center;
+}
+
+.media-image,
+.media-video {
+    width: 100%;
+    border-radius: 5px;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination-button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.page-info {
+    margin-left: 20px;
+    font-size: 16px;
+}
