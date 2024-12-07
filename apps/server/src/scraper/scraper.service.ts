@@ -24,34 +24,63 @@ export class ScraperService {
     return this.scraperRepository.getPaginatedMedia(type, search, page, limit);
   }
 
+  async saveUrls(urlArrayDto: UrlArrayDto): Promise<void> {
+    try {
+      await this.scraperRepository.saveUrls(urlArrayDto.urls);
+    } catch (error) {
+      this.logger.error(
+        `Failed to save URLs to the repository: ${error.message}`,
+        error.stack,
+      );
+      throw error;
+    }
+  }
+
   /**
    * Scrapes media from an array of URLs.
-   * @param dto - DTO containing the array of URLs.
+   * @param urls - Array of URLs to scrape.
    */
   async scrapeMedia(
-    dto: UrlArrayDto,
+    urls: string[],
   ): Promise<{ success: boolean; message: string }> {
-    const { urls } = dto; // Destructure URLs from DTO
-
-    for (const url of urls) {
-      try {
-        this.logger.log(`Scraping URL: ${url}`);
+    try {
+      // Extract media from each URL
+      for (const url of urls) {
         const media = await this.extractMediaFromUrl(url);
-        if (media.length > 0) {
-          this.logger.log(`Saving ${media.length} media items from ${url}`);
-          await this.scraperRepository.saveMedia(media);
-        } else {
-          this.logger.warn(`No media found at ${url}`);
-        }
-      } catch (error) {
-        this.logger.error(
-          `Error scraping ${url}: ${error.message}`,
-          error.stack,
+        await this.scraperRepository.saveMedia(
+          media.map((m) => ({
+            ...m,
+            source_url: m.sourceUrl,
+            created_at: new Date(),
+            status: 'ready',
+          })),
         );
       }
-    }
 
-    return { success: true, message: 'Scraping completed successfully!' };
+      return { success: true, message: 'Media scraped successfully' };
+    } catch (error) {
+      this.logger.error(
+        `Failed to scrape media from URLs: ${error.message}`,
+        error.stack,
+      );
+      return { success: false, message: 'Failed to scrape media' };
+    }
+  }
+
+  async getUrlsReadyOrTimedOut(): Promise<string[]> {
+    return this.scraperRepository.getUrlsReadyOrTimedOut();
+  }
+
+  async updateUrlsStatus(urls: string[], status: string): Promise<void> {
+    try {
+      await this.scraperRepository.updateUrlsStatus(urls, status);
+    } catch (error) {
+      this.logger.error(
+        `Failed to update URLs status: ${error.message}`,
+        error.stack,
+      );
+      throw error;
+    }
   }
 
   /**

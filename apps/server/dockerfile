@@ -1,0 +1,40 @@
+# Step 1: Use the official Node.js image as the base image
+FROM node:18-alpine AS builder
+
+# Step 2: Set the working directory
+WORKDIR /usr/src/app
+
+# Step 3: Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Step 4: Install dependencies using pnpm
+RUN npm install -g pnpm && pnpm install --frozen-lockfile && npm i -g pm2 
+
+# Step 5: Copy the rest of the application code
+COPY . .
+
+# Step 6: Build the application
+RUN pnpm build
+
+# Step 7: Remove dev dependencies for production
+RUN pnpm prune --prod
+
+# Step 8: Use a lightweight runtime image for production
+FROM node:18-alpine AS runtime
+
+# Step 9: Set the working directory
+WORKDIR /usr/src/app
+
+# Step 10: Copy built files and production dependencies from the builder stage
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/package.json ./package.json
+
+# Step 11: Set environment variables
+ENV PORT=4000
+
+# Step 12: Expose the port the app runs on
+EXPOSE 4000
+
+# Step 13: Define the command to run the application
+CMD ["node", "dist/main.js"]

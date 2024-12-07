@@ -1,14 +1,44 @@
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { IScraperRepository } from './scraper.interface';
-import { Media } from './scraper.model';
+import { Medias } from './model/medias.model';
+import { Urls } from './model/urls.model';
 
 export class PostGresRepository implements IScraperRepository {
-  constructor(@InjectModel(Media) private mediaModel: typeof Media) {}
+  constructor(
+    @InjectModel(Medias)
+    private mediaModel: typeof Medias,
+    @InjectModel(Urls)
+    private urlsModel: typeof Urls,
+  ) {}
+
+  async saveUrls(urls: string[]): Promise<void> {
+    if (!this.urlsModel.sequelize) {
+      throw new Error('Sequelize instance is not available');
+    }
+
+    const transaction = await this.urlsModel.sequelize.transaction();
+    try {
+      await this.urlsModel.bulkCreate(
+        urls.map((url) => ({ url })),
+        { transaction },
+      );
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
 
   async saveMedia(
-    mediaData: { url: string; type: string; sourceUrl: string }[],
-  ): Promise<Media[]> {
+    mediaData: {
+      url: string;
+      type: string;
+      sourceUrl: string;
+      status: string;
+      processTimeOut: Date;
+    }[],
+  ): Promise<Medias[]> {
     if (!this.mediaModel.sequelize) {
       throw new Error('Sequelize instance is not available');
     }
@@ -31,7 +61,7 @@ export class PostGresRepository implements IScraperRepository {
     search?: string,
     page = 1,
     limit = 10,
-  ): Promise<{ data: Media[]; total: number }> {
+  ): Promise<{ data: Medias[]; total: number }> {
     const where: any = {};
 
     if (type) {
@@ -49,5 +79,34 @@ export class PostGresRepository implements IScraperRepository {
     });
 
     return { data: rows, total: count };
+  }
+
+  async getUrlsReadyOrTimedOut(): Promise<string[]> {
+    const urls = await this.urlsModel.findAll({
+      where: {
+        status: {
+          [Op.or]: ['ready', 'failed'],
+        },
+      },
+    });
+
+    return urls.map((url) => url.url);
+  }
+
+  async updateUrlsStatus(urls: string[], status: string): Promise<void> {
+    try {
+      await this.urlsModel.update(
+        { status },
+        {
+          where: {
+            url: {
+              [Op.in]: urls,
+            },
+          },
+        },
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 }

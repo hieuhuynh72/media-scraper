@@ -9,21 +9,31 @@ export class ScraperController {
 
   // Endpoint to fetch media from the database
   @Get('media')
+  // @UseGuards(AuthGuard('bearer'))
   async getMedia(
     @Query('type') type?: string,
     @Query('search') search?: string,
     @Query('page') page = 1,
     @Query('limit') limit = 10,
   ) {
-    return this.scraperService.getPaginatedMedia(type, search, page, limit);
+    // Call the service to fetch media
+    const result = await this.scraperService.getPaginatedMedia(
+      type,
+      search,
+      page,
+      limit,
+    );
+    return result;
   }
 
-  @Post()
+  @Post('urls')
   @UsePipes(new ZodValidationPipe(urlArraySchema))
-  async scrape(@Body() urls: UrlArrayDto) {
-    console.log('Scraping URLs:', urls);
-    // Call the service to scrape media from the URLs
-    const result = await this.scraperService.scrapeMedia(urls);
-    return result;
+  async saveUrls(@Body() dto: UrlArrayDto) {
+    try {
+      await this.scraperService.saveUrls(dto);
+      return { success: true, message: 'URLs saved successfully' };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
   }
 }

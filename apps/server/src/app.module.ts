@@ -1,13 +1,18 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ScraperModule } from './scraper/scraper.module';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Media } from './scraper/scraper.model';
+import { Medias } from './scraper/model/medias.model';
+import { JobsModule } from './jobs/jobs.module';
+import { Urls } from './scraper/model/urls.model';
 
 @Module({
   imports: [
     ScraperModule,
+    ScheduleModule.forRoot(),
+    JobsModule,
     SequelizeModule.forRoot({
       dialect: 'postgres',
       host: 'localhost',
@@ -15,10 +20,13 @@ import { Media } from './scraper/scraper.model';
       username: 'localhost',
       password: 'postgres',
       database: 'postgres',
-      models: [Media],
-      autoLoadModels: true, // Automatically load models
+      models: [Urls, Medias], // Register models
+      define: {
+        underscored: true, // Use snake_case for all columns
+      },
       synchronize: true, // Sync models with the database (not for production)
     }),
+    SequelizeModule.forFeature([Urls, Medias]),
   ],
   controllers: [AppController],
   providers: [AppService],

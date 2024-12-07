@@ -2,12 +2,13 @@ import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ScraperService } from './scraper.service';
 import { ScraperController } from './scraper.controller';
-import { Media } from './scraper.model';
+import { Medias } from './model/medias.model';
+import { Urls } from './model/urls.model';
 import { PostGresRepository } from './scraper.repository';
 import { SCRAPER_CONSTANTS } from './scraper.constant';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Media])],
+  imports: [SequelizeModule.forFeature([Medias, Urls])],
   controllers: [ScraperController],
   providers: [
     ScraperService,
@@ -17,5 +18,6 @@ import { SCRAPER_CONSTANTS } from './scraper.constant';
       useClass: PostGresRepository,
     },
   ],
+  exports: [ScraperService],
 })
 export class ScraperModule {}
