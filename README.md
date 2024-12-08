@@ -19,7 +19,7 @@ The Media Scraper is a robust application built using **NestJS** for the backend
 
 ## **Project Structure**
   ```plaintext
-  root/
+  apps/
   ├── client/          # Frontend application (React.js / Next.js)
   ├── server/          # Backend application (NestJS)
   ├── Dockerfile       # Root Dockerfile for orchestration
