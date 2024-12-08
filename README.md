@@ -74,13 +74,13 @@ The Media Scraper is a robust application built using **NestJS** for the backend
 3. **Build the Application**:
 - **Frontend**:
   ```bash
-  git clone git@github.com:hieuhuynh72/media-scraper.git
-  cd media-scraper
+  cd server
+  pnpm build
   ```
 - **Backend**:
   ```bash
   cd server
-  pnpm run build
+  pnpm build
    ```
 ---
 ### **Running the Application**
