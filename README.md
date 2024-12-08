@@ -33,10 +33,9 @@ The Media Scraper is a robust application built using **NestJS** for the backend
 
 ### **Backend**
 - **NestJS**: A modular, TypeScript-based framework for building scalable server-side applications.
-- **MongoDB**: NoSQL database for storing scraped data.
+- **Postgres**: SQL database for storing scraped data.
 - **Bee-queue**: A high-performance job queue to manage scraping tasks efficiently.
 - **Web Scraping Tools**: 
-  - **Puppeteer**: Headless browser for scraping dynamic web pages.
   - **Cheerio**: Lightweight scraping library for parsing static HTML content.
 
 ### **Frontend**
