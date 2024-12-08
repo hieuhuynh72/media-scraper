@@ -1,9 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { IScraperRepository } from './scraper.interface';
 import { SCRAPER_CONSTANTS } from './scraper.constant';
-import { UrlArrayDto } from './scraper.dto';
+import { GetMediaQueryDto, UrlArrayDto } from './scraper.dto';
 
 @Injectable()
 export class ScraperService {
@@ -15,13 +14,14 @@ export class ScraperService {
   ) {}
 
   // Method to get media from the repository
-  async getPaginatedMedia(
-    type?: string,
-    search?: string,
-    page = 1,
-    limit = 10,
-  ) {
-    return this.scraperRepository.getPaginatedMedia(type, search, page, limit);
+  async getPaginatedMedia(getMediaQueryDto: GetMediaQueryDto) {
+    return this.scraperRepository.getPaginatedMedia(
+      getMediaQueryDto.urls,
+      getMediaQueryDto.type,
+      getMediaQueryDto.search,
+      getMediaQueryDto.page,
+      getMediaQueryDto.limit,
+    );
   }
 
   async saveUrls(urlArrayDto: UrlArrayDto): Promise<void> {
@@ -83,6 +83,19 @@ export class ScraperService {
     }
   }
 
+  async getData(url: string) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+
+      return await response.text();
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
   /**
    * Extracts media (images and videos) from a single URL.
    * @param url - URL to scrape.
@@ -92,14 +105,13 @@ export class ScraperService {
     url: string,
   ): Promise<{ url: string; type: string; sourceUrl: string }[]> {
     try {
-      const response = await axios.get(url);
-      const $ = cheerio.load(response.data);
+      const response = (await this.getData(url)) || '';
+      const $ = cheerio.load(response);
       const media: { url: string; type: string; sourceUrl: string }[] = [];
-
       // Extract images
       $('img').each((_, element) => {
         const src = $(element).attr('src');
-        if (src) {
+        if (src && !src.startsWith('data:')) {
           media.push({
             url: new URL(src, url).toString(),
             type: 'image',
@@ -109,7 +121,7 @@ export class ScraperService {
       });
 
       // Extract videos
-      $('video source').each((_, element) => {
+      $('video').each((_, element) => {
         const src = $(element).attr('src');
         if (src) {
           media.push({

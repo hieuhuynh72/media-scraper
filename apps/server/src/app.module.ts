@@ -7,9 +7,14 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Medias } from './scraper/model/medias.model';
 import { JobsModule } from './jobs/jobs.module';
 import { Urls } from './scraper/model/urls.model';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { Requests } from './scraper/model/request.model';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     ScraperModule,
     ScheduleModule.forRoot(),
     JobsModule,
@@ -20,13 +25,15 @@ import { Urls } from './scraper/model/urls.model';
       username: 'localhost',
       password: 'postgres',
       database: 'postgres',
-      models: [Urls, Medias], // Register models
+      models: [Requests, Urls, Medias], // Register models
       define: {
         underscored: true, // Use snake_case for all columns
       },
       synchronize: true, // Sync models with the database (not for production)
     }),
-    SequelizeModule.forFeature([Urls, Medias]),
+    SequelizeModule.forFeature([Requests, Urls, Medias]),
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

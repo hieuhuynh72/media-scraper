@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import { IScraperRepository } from './scraper.interface';
 import { Medias } from './model/medias.model';
 import { Urls } from './model/urls.model';
+import { Requests } from './model/request.model';
 
 export class PostGresRepository implements IScraperRepository {
   constructor(
@@ -10,6 +11,8 @@ export class PostGresRepository implements IScraperRepository {
     private mediaModel: typeof Medias,
     @InjectModel(Urls)
     private urlsModel: typeof Urls,
+    @InjectModel(Requests)
+    private requetsModel: typeof Requests,
   ) {}
 
   async saveUrls(urls: string[]): Promise<void> {
@@ -57,12 +60,19 @@ export class PostGresRepository implements IScraperRepository {
   }
 
   async getPaginatedMedia(
+    urls: string[],
     type?: string,
     search?: string,
     page = 1,
     limit = 10,
   ): Promise<{ data: Medias[]; total: number }> {
     const where: any = {};
+
+    if (!urls.length) {
+      return { data: [], total: 0 };
+    }
+
+    where.source_url = { [Op.in]: urls };
 
     if (type) {
       where.type = type;

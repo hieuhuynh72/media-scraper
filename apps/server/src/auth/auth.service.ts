@@ -1,30 +1,25 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '../config/config.service';
-import OktaJwtVerifier from '@okta/jwt-verifier';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  private oktaJwtVerifier: OktaJwtVerifier;
-  private audience: string;
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
-  constructor(private readonly config: ConfigService) {
-    this.oktaJwtVerifier = new OktaJwtVerifier({
-      issuer: this.config.get('OKTA_ISSUER'),
-      clientId: this.config.get('OKTA_CLIENTID'),
-    });
-
-    this.audience = this.config.get('OKTA_AUDIENCE');
-  }
-
-  async validateToken(token: string): Promise<any> {
-    try {
-      const jwt = await this.oktaJwtVerifier.verifyAccessToken(
-        token,
-        this.audience,
-      );
-      return jwt;
-    } catch (err) {
-      throw new UnauthorizedException('Invalid token', err.message);
+  async signIn(
+    username: string,
+    pass: string,
+  ): Promise<{ access_token: string }> {
+    const user = await this.usersService.findOne(username);
+    if (user?.password !== pass) {
+      throw new UnauthorizedException();
     }
+    const payload = { sub: user.userId, username: user.username };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

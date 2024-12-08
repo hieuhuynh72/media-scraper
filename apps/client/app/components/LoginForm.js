@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
 import { useState } from "react";
 
 export default function LoginForm() {
@@ -8,14 +6,14 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e) => {
     console.log("handleSubmit");
     e.preventDefault();
     setLoading(true);
     setError("");
 
     // Send login request to your backend at http://localhost:4000/api/login
-    const response = await fetch("http://localhost:4000/auth/login", {
+    const response = await fetch("http://localhost:4000/api/login", {
       // Update the URL here
       method: "POST",
       headers: {

@@ -6,6 +6,7 @@ export interface IScraperRepository {
   ): Promise<Medias[]>;
 
   getPaginatedMedia(
+    urls: string[],
     type?: string,
     search?: string,
     page?: number,

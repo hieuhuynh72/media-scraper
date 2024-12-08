@@ -1,32 +1,31 @@
-import { Controller, Post, Body, UsePipes, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, UsePipes, UseGuards } from '@nestjs/common';
 import { ScraperService } from './scraper.service';
 import { ZodValidationPipe } from './scaper.pipe';
-import { UrlArrayDto, urlArraySchema } from './scraper.dto';
+import {
+  GetMediaQueryDto,
+  getMediaQuerySchema,
+  UrlArrayDto,
+  urlArraySchema,
+} from './scraper.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('scraper')
 export class ScraperController {
   constructor(private readonly scraperService: ScraperService) {}
 
   // Endpoint to fetch media from the database
-  @Get('media')
-  // @UseGuards(AuthGuard('bearer'))
-  async getMedia(
-    @Query('type') type?: string,
-    @Query('search') search?: string,
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ) {
+  @Post('medias')
+  @UseGuards(AuthGuard)
+  @UsePipes(new ZodValidationPipe(getMediaQuerySchema))
+  async getMedia(@Body() getMediaQueryDto: GetMediaQueryDto) {
     // Call the service to fetch media
-    const result = await this.scraperService.getPaginatedMedia(
-      type,
-      search,
-      page,
-      limit,
-    );
+    const result =
+      await this.scraperService.getPaginatedMedia(getMediaQueryDto);
     return result;
   }
 
   @Post('urls')
+  @UseGuards(AuthGuard)
   @UsePipes(new ZodValidationPipe(urlArraySchema))
   async saveUrls(@Body() dto: UrlArrayDto) {
     try {
