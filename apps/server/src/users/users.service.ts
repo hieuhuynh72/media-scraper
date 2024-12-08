@@ -7,8 +7,8 @@ export class UsersService {
   private readonly users = [
     {
       userId: 1,
-      username: 'john',
-      password: 'changeme',
+      username: 'momos',
+      password: 'admin123',
     },
     {
       userId: 2,
