@@ -98,13 +98,14 @@ The Media Scraper is a robust application built using **NestJS** for the backend
 1. **Frontend**:
   ```bash
   cd client
-  pnpm run dev
+  pnpm dev
   ```
   Access: http://localhost:3000
+
 2. **Backend**:
   ```bash
   cd server
-  pnpm run build
+  pnpm build
   ```
   Access: http://localhost:4000
 
