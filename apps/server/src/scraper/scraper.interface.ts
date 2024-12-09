@@ -15,7 +15,9 @@ export interface IScraperRepository {
 
   saveUrls(urls: string[]): Promise<void>;
 
-  getUrlsReadyOrTimedOut(): Promise<string[]>;
+  getUrlIdsReadyOrTimedOut(): Promise<string[]>;
+
+  getUrlsByIds(ids: string[]): Promise<string[]>;
 
   updateUrlsStatus(urls: string[], status: string): Promise<void>;
 }

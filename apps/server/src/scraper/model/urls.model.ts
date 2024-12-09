@@ -1,12 +1,4 @@
-import {
-  Table,
-  Column,
-  Model,
-  DataType,
-  ForeignKey,
-  BelongsTo,
-} from 'sequelize-typescript';
-import { Requests } from './request.model';
+import { Table, Column, Model, DataType } from 'sequelize-typescript';
 
 @Table({
   tableName: 'urls',
@@ -30,14 +22,4 @@ export class Urls extends Model {
     allowNull: true,
   })
   error: string; // Optional field to store error messages if the status is 'failed'
-
-  @ForeignKey(() => Requests)
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  request_id: string; // The URL from which the media was scraped
-
-  @BelongsTo(() => Requests)
-  source: Requests; // Establish the relationship with the Requests table
 }

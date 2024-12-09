@@ -9,8 +9,8 @@ import { JobsModule } from './jobs/jobs.module';
 import { Urls } from './scraper/model/urls.model';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { User } from './users/model/users.model';
 import { ConfigModule } from '@nestjs/config';
-import { Requests } from './scraper/model/request.model';
 
 @Module({
   imports: [
@@ -25,13 +25,14 @@ import { Requests } from './scraper/model/request.model';
       username: 'localhost',
       password: 'postgres',
       database: 'postgres',
-      models: [Requests, Urls, Medias], // Register models
+      models: [Urls, Medias, User], // Register models
       define: {
         underscored: true, // Use snake_case for all columns
       },
-      synchronize: true, // Sync models with the database (not for production)
+      synchronize: true, // Sync models with the database (not for production),
+      autoLoadModels: true,
     }),
-    SequelizeModule.forFeature([Requests, Urls, Medias]),
+    SequelizeModule.forFeature([Urls, Medias, User]),
     UsersModule,
     AuthModule,
   ],

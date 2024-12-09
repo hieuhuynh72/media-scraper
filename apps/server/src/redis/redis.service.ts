@@ -23,6 +23,10 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  getClient() {
+    return this.client;
+  }
+
   // On module destruction, we close the Redis connection
   onModuleDestroy() {
     this.client.disconnect();

@@ -3,7 +3,6 @@ import { Op } from 'sequelize';
 import { IScraperRepository } from './scraper.interface';
 import { Medias } from './model/medias.model';
 import { Urls } from './model/urls.model';
-import { Requests } from './model/request.model';
 
 export class PostGresRepository implements IScraperRepository {
   constructor(
@@ -11,8 +10,6 @@ export class PostGresRepository implements IScraperRepository {
     private mediaModel: typeof Medias,
     @InjectModel(Urls)
     private urlsModel: typeof Urls,
-    @InjectModel(Requests)
-    private requetsModel: typeof Requests,
   ) {}
 
   async saveUrls(urls: string[]): Promise<void> {
@@ -91,7 +88,7 @@ export class PostGresRepository implements IScraperRepository {
     return { data: rows, total: count };
   }
 
-  async getUrlsReadyOrTimedOut(): Promise<string[]> {
+  async getUrlIdsReadyOrTimedOut(): Promise<string[]> {
     const urls = await this.urlsModel.findAll({
       where: {
         status: {
@@ -100,17 +97,17 @@ export class PostGresRepository implements IScraperRepository {
       },
     });
 
-    return urls.map((url) => url.url);
+    return urls.map((url) => url.id);
   }
 
-  async updateUrlsStatus(urls: string[], status: string): Promise<void> {
+  async updateUrlsStatus(ids: string[], status: string): Promise<void> {
     try {
       await this.urlsModel.update(
         { status },
         {
           where: {
-            url: {
-              [Op.in]: urls,
+            id: {
+              [Op.in]: ids,
             },
           },
         },
@@ -118,5 +115,17 @@ export class PostGresRepository implements IScraperRepository {
     } catch (error) {
       throw error;
     }
+  }
+
+  async getUrlsByIds(ids: string[]): Promise<string[]> {
+    const urls = await this.urlsModel.findAll({
+      where: {
+        id: {
+          [Op.in]: ids,
+        },
+      },
+    });
+
+    return urls.map((url) => url.url);
   }
 }

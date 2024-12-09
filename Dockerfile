@@ -16,13 +16,25 @@ RUN pnpm install --frozen-lockfile
 # Copy the entire project
 COPY . .
 
-# Build the Next.js app
+# Copy client package.json and pnpm-lock.yaml
 WORKDIR /apps/client
-# RUN pnpm run build
+COPY package.json  ./
+
+# Install client dependencies
+RUN pnpm install --frozen-lockfile
+
+# Build the Next.js app
+RUN pnpm run build
+
+# Copy server package.json and pnpm-lock.yaml
+WORKDIR /apps/server
+COPY package.json  ./
+
+# Install server dependencies
+RUN pnpm install --frozen-lockfile
 
 # Build the NestJS app
-WORKDIR /apps/server
-# RUN pnpm run build
+RUN pnpm run build
 
 # Stage 2: Production Stage
 FROM node:18-slim AS production
@@ -34,9 +46,11 @@ WORKDIR /apps
 RUN npm install -g pnpm
 
 # Copy only necessary files from the build stage
-# COPY --from=build /apps/client/.next /apps/client/.next
-# COPY --from=build /apps/server/dist /apps/server/dist
+COPY --from=build /apps/client/.next /apps/client/.next
+COPY --from=build /apps/server/dist /apps/server/dist
 COPY --from=build /apps/package.json /apps/pnpm-lock.yaml ./
+COPY --from=build /apps/client/package.json /apps/client/package.json
+COPY --from=build /apps/server/package.json /apps/server/package.json
 
 # Install only production dependencies
 RUN pnpm install --frozen-lockfile --recursive
