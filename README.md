@@ -177,3 +177,15 @@ The application requires an `.env` file in the apps/server directory with the fo
   ```plaintext
   JWT_SECRET=your_secret_key
   ```
+---
+
+## **Authentication**
+The application uses **JWT** for authentication. The user must log in to access the web scraping functionality.
+
+You can use this account to log in:
+  ```plaintext
+  Username: momos
+  Password: admin123
+  ```
+
+---
