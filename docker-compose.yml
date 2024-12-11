@@ -22,6 +22,31 @@ services:
     networks:
       - mynetwork
 
+  client:
+    build:
+      context: .
+      dockerfile: apps/client/Dockerfile
+    container_name: client
+    ports:
+      - "3000:3000"
+    networks:
+      - mynetwork
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: server
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - POSTGRES_HOST=db
+      - JWT_SECRET=s3cr3tK3yG3n3r4t3dStr1ng==
+    ports:
+      - "4000:4000"
+    networks:
+      - mynetwork
+
 volumes:
   postgres_data:
     driver: local

@@ -37,7 +37,10 @@ export class JobsService implements OnModuleInit {
     ]; // Add your queue names here
     for (const name of queueNames) {
       const queue = new BeeQueue<JobData>(name, {
-        redis: this.redisService.getClient(),
+        redis: {
+          host: process.env.REDIS_HOST || 'localhost', // Redis host (default is localhost)
+          port: 6379, // Redis port (default is 6379)
+        },
       });
 
       this.queues.push(queue);

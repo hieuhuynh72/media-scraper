@@ -9,7 +9,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   // On module initialization, we create the Redis client
   onModuleInit() {
     this.client = new Redis({
-      host: 'localhost', // Redis host (default is localhost)
+      host: process.env.REDIS_HOST || 'localhost', // Redis host (default is localhost)
       port: 6379, // Redis port (default is 6379)
     });
 

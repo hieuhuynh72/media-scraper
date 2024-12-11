@@ -1,40 +1,33 @@
-# Step 1: Use the official Node.js image as the base image
-FROM node:18-alpine AS builder
+# Stage 1: Build Stage
+FROM node:20 AS build
 
-# Step 2: Set the working directory
-WORKDIR /usr/src/app
+# Set working directory
+WORKDIR /apps/server
 
-# Step 3: Copy package files
-COPY package.json pnpm-lock.yaml ./
+# Install pnpm globally
+RUN npm install -g pnpm
 
-# Step 4: Install dependencies using pnpm
-RUN npm install -g pnpm && pnpm install --frozen-lockfile && npm i -g pm2 
+# Copy client package.json and pnpm-lock.yaml from the root directory
+COPY package.json ./
 
-# Step 5: Copy the rest of the application code
+# Install client dependencies
+RUN pnpm install
+
+# Copy the entire client project
 COPY . .
 
-# Step 6: Build the application
-RUN pnpm build
+# Build the Next.js app
+RUN pnpm build:server
 
-# Step 7: Remove dev dependencies for production
-RUN pnpm prune --prod
+# Stage 2: Production Stage
+FROM node:20
 
-# Step 8: Use a lightweight runtime image for production
-FROM node:18-alpine AS runtime
+# Set working directory
+WORKDIR /apps/server
 
-# Step 9: Set the working directory
-WORKDIR /usr/src/app
+# Copy only necessary files from the build stage
+COPY --from=build /apps/server/node_modules /apps/server/node_modules
+COPY --from=build /apps/server/apps/server/node_modules /apps/server/apps/server/node_modules
+COPY --from=build /apps/server/apps/server/dist /apps/server/apps/server/dist
 
-# Step 10: Copy built files and production dependencies from the builder stage
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/package.json ./package.json
-
-# Step 11: Set environment variables
-ENV PORT=4000
-
-# Step 12: Expose the port the app runs on
-EXPOSE 4000
-
-# Step 13: Define the command to run the application
-CMD ["node", "dist/main.js"]
+CMD ["sh", "-c", "cd apps/server npx sequelize-cli db:migrate && node /apps/server/apps/server/dist/main.js"]

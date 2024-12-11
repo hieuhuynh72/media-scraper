@@ -20,7 +20,7 @@ import { ConfigModule } from '@nestjs/config';
     JobsModule,
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      host: 'localhost',
+      host: process.env.POSTGRES_HOST || 'localhost',
       port: 5432,
       username: 'localhost',
       password: 'postgres',
