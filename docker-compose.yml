@@ -46,6 +46,11 @@ services:
       - "4000:4000"
     networks:
       - mynetwork
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1g
 
 volumes:
   postgres_data:
