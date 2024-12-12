@@ -24,13 +24,9 @@ export class Medias extends Model {
   })
   type: string; // 'image' or 'video'
 
-  @ForeignKey(() => Urls)
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   source_url: string; // The URL from which the media was scraped
-
-  @BelongsTo(() => Urls)
-  source: Urls; // Establish the relationship with the Urls table
 }

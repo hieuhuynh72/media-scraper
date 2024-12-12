@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "pnpm run --parallel dev",
     "build:client": "cd apps/client && pnpm i && pnpm run build",
-    "build:server": "cd apps/server && pnpm i && pnpm run build",
-    "start:client": "cd apps/client && pnpm i && pnpm run start"
+    "build:server": "cd apps/server && pnpm i && pnpm run build"
   },
   "keywords": [],
   "author": "hieuhuynh",
