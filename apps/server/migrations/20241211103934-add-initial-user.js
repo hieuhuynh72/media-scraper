@@ -1,4 +1,5 @@
-'use strict';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const bcrypt = require('bcrypt');
 
 module.exports = {
   up: async (queryInterface) => {
@@ -7,9 +8,9 @@ module.exports = {
       [
         {
           username: 'momos',
-          password: 'admin123', // Make sure to hash the password in a real application
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          password: bcrypt.hashSync('admin123', 10),
+          created_at: new Date(),
+          updated_at: new Date(),
         },
       ],
       {},

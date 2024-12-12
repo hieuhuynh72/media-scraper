@@ -11,6 +11,7 @@ RUN npm install -g pnpm
 COPY package.json ./
 
 # Install client dependencies
+RUN npm install bcrypt
 RUN pnpm install
 
 # Copy the entire client project
@@ -28,6 +29,8 @@ WORKDIR /apps/server
 # Copy only necessary files from the build stage
 COPY --from=build /apps/server/node_modules /apps/server/node_modules
 COPY --from=build /apps/server/apps/server/node_modules /apps/server/apps/server/node_modules
+COPY --from=build /apps/server/apps/server/config/config.json /apps/server/apps/server/config/config.json
+COPY --from=build /apps/server/apps/server/migrations /apps/server/apps/server/migrations
 COPY --from=build /apps/server/apps/server/dist /apps/server/apps/server/dist
 
-CMD ["sh", "-c", "cd apps/server npx sequelize-cli db:migrate && node /apps/server/apps/server/dist/main.js"]
+CMD ["sh", "-c", "node /apps/server/apps/server/dist/main.js"]

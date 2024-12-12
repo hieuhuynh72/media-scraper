@@ -170,13 +170,14 @@ The queue is configured in the backend with:
       pnpm start
       ```
 
----
+  - **Create data for users**:
+    ```bash
+    docker ps
+    docker exec -it <container_id> bash
+    cd apps/server
+    npx sequelize-cli db:migrate
+    ```
 
-## **Environment File**
-The application requires an `.env` file in the apps/server directory with the following variables:
-  ```plaintext
-  JWT_SECRET=your_secret_key
-  ```
 ---
 
 ## **Authentication**
