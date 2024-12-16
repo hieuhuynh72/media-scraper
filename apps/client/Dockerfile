@@ -1,5 +1,5 @@
 # Stage 1: Build Stage
-FROM node:20 AS build
+FROM node:20-alpine AS build
 
 # Set working directory
 WORKDIR /apps/client
@@ -9,6 +9,7 @@ RUN npm install -g pnpm
 
 # Copy client package.json and pnpm-lock.yaml from the root directory
 COPY package.json ./
+COPY pnpm-lock.yaml ./
 
 # Install client dependencies
 RUN pnpm install
@@ -20,8 +21,7 @@ COPY . .
 RUN pnpm build:client
 
 # Stage 2: Production Stage
-# FROM nginx:alpine
-FROM node:20-slim AS production
+FROM node:20-alpine AS production
 
 # Set working directory
 WORKDIR /apps/client

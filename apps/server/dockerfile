@@ -9,6 +9,7 @@ RUN npm install -g pnpm
 
 # Copy client package.json and pnpm-lock.yaml from the root directory
 COPY package.json ./
+COPY pnpm-lock.yaml ./
 
 # Install client dependencies
 RUN npm install bcrypt
@@ -21,7 +22,7 @@ COPY . .
 RUN pnpm build:server
 
 # Stage 2: Production Stage
-FROM node:20
+FROM node:20-alpine AS production
 
 # Set working directory
 WORKDIR /apps/server
